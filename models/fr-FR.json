@@ -1,7 +1,7 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "le génie des salutations",
+            "invocationName": "le génie des vidéos",
             "intents": [
                 {
                     "name": "AMAZON.CancelIntent",
@@ -16,13 +16,32 @@
                     "samples": []
                 },
                 {
-                    "name": "HelloWorldIntent",
+                    "name": "AMAZON.NextIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.PreviousIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.PauseIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.ResumeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StartOverIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AboutIntent",
                     "slots": [],
                     "samples": [
-                        "bonjour",
-                        "coucou",
-                        "salut",
-                        "me dire bonjour"
+                        "c'est quoi ça",
+                        "affiche la description",
+                        "quelle est cette vidéo"
                     ]
                 },
                 {

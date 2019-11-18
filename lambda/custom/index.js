@@ -3,38 +3,125 @@
  * Please visit https://alexa.design/cookbook for additional examples on implementing slots, dialog management,
  * session persistence, api calls, and more.
  * */
-const Alexa = require('ask-sdk-core');
+const Alexa = require('ask-sdk');
 // i18n library dependency, we use it below in a localisation interceptor
 const i18n = require('i18next');
 // i18n strings for all supported locales
 const languageStrings = require('./languageStrings');
 
-const LaunchRequestHandler = {
+const NoAPLHandler = {
     canHandle(handlerInput) {
-        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
+        return (! handlerInput.requestEnvelope.context.System.device.supportedInterfaces['Alexa.Presentation.APL']);
     },
     handle(handlerInput) {
-        const speakOutput = handlerInput.t('WELCOME_MSG');
-
         return handlerInput.responseBuilder
-            .speak(speakOutput)
-            .reprompt(speakOutput)
+                .speak(handlerInput.t('NO_SCREEN_MSG'))
+                .getResponse();
+    }
+};
+
+const LaunchRequestHandler = {
+    canHandle(handlerInput) {
+        return (Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest'
+        || handlerInput.requestEnvelope.session.new === true); // Launch videoplayer for one-shot requests as well
+    },
+    handle(handlerInput) {
+        return handlerInput.responseBuilder
+            .addDirective(require('./apl/render-videoplayer')([
+                {
+                    "url": "https://skill-sample-apl-video.s3-eu-west-1.amazonaws.com/northernspain.mp4",
+                    "title": "Northern Spain",
+                    "subtitle": "Drone footage of northern Spain landscapes"
+                },
+                {
+                    "url": "https://skill-sample-apl-video.s3-eu-west-1.amazonaws.com/Driving_timelapse_CCBY_NatureClip.mov",
+                    "title": "Driving timelapse",
+                    "subtitle": "Timelapse video of a country road in the UK"
+                }
+            ]))
             .getResponse();
     }
 };
 
-const HelloWorldIntentHandler = {
+const NextIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'HelloWorldIntent';
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.NextIntent';
     },
     handle(handlerInput) {
-        const speakOutput = handlerInput.t('HELLO_MSG');
-
         return handlerInput.responseBuilder
-            .speak(speakOutput)
-            //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
+            .addDirective(require('./apl/execute-next')())
             .getResponse();
+    }
+};
+
+const PreviousIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.PreviousIntent';
+    },
+    handle(handlerInput) {
+        return handlerInput.responseBuilder
+            .addDirective(require('./apl/execute-previous')())
+            .getResponse();
+    }
+};
+
+const PauseIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.PauseIntent';
+    },
+    handle(handlerInput) {
+        return handlerInput.responseBuilder
+            .addDirective(require('./apl/execute-pause')())
+            .getResponse();
+    }
+};
+
+const ResumeIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.ResumeIntent';
+    },
+    handle(handlerInput) {
+        return handlerInput.responseBuilder
+            .addDirective(require('./apl/execute-play')())
+            .getResponse();
+    }
+};
+
+const StartOverIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.StartOverIntent';
+    },
+    handle(handlerInput) {
+        return handlerInput.responseBuilder
+            .addDirective(require('./apl/execute-startover')())
+            .getResponse();
+    }
+};
+
+const AboutIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AboutIntent';
+    },
+    handle(handlerInput) {
+        return handlerInput.responseBuilder
+            .addDirective(require('./apl/execute-about')())
+            .getResponse();
+    }
+};
+
+const UserEventHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'Alexa.Presentation.APL.UserEvent';
+    },
+    handle(handlerInput) {
+        console.log("=== UserEvent received ===\n" + JSON.stringify(handlerInput.requestEnvelope.request));
+        return handlerInput.responseBuilder.getResponse();
     }
 };
 
@@ -64,6 +151,7 @@ const CancelAndStopIntentHandler = {
 
         return handlerInput.responseBuilder
             .speak(speakOutput)
+            .withShouldEndSession(true)
             .getResponse();
     }
 };
@@ -156,11 +244,21 @@ const LocalisationRequestInterceptor = {
  * payloads to the handlers above. Make sure any new handlers or interceptors you've
  * defined are included below. The order matters - they're processed top to bottom 
  * */
-exports.handler = Alexa.SkillBuilders.custom()
+
+const skillBuilder = Alexa.SkillBuilders.standard();
+
+const skillBuilderWithHandlers = skillBuilder
     .addRequestHandlers(
+        NoAPLHandler,
         LaunchRequestHandler,
-        HelloWorldIntentHandler,
+        AboutIntentHandler,
+        UserEventHandler,
         HelpIntentHandler,
+        NextIntentHandler,
+        PreviousIntentHandler,
+        PauseIntentHandler,
+        ResumeIntentHandler,
+        StartOverIntentHandler,
         CancelAndStopIntentHandler,
         FallbackIntentHandler,
         SessionEndedRequestHandler,
@@ -169,5 +267,11 @@ exports.handler = Alexa.SkillBuilders.custom()
         ErrorHandler)
     .addRequestInterceptors(
         LocalisationRequestInterceptor)
-    .withCustomUserAgent('sample/hello-world/v1.2')
-    .lambda();
+    ;
+
+// For AWS Lambda
+exports.handler = skillBuilderWithHandlers.lambda();
+
+// For local server
+exports.skill = skillBuilderWithHandlers
+.create();
