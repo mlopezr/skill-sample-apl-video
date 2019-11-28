@@ -274,34 +274,54 @@ module.exports = (playlist) => {
                                 "width": "100vw",
                                 "height": "100vh",
                                 "alignItems": "center",
+                                "justifyContent": "${@viewportProfile == @hubRoundSmall ? 'center' : 'start'}",
                                 "items": [
                                     {
-                                        "type": "Text",
-                                        "id": "title",
-                                        "text": " ",
-                                        "width": "100vw",
-                                        "fontSize": "8vh",
-                                        "paddingTop": "3vh",
-                                        "paddingLeft": "3vh"
+                                        "type": "Frame",
+                                        "backgroundColor": "rgba(0,0,0,40%)",
+                                        "paddingTop": "5vh",
+                                        "paddingBottom": "5vh",
+                                        "paddingLeft": "5vh",
+                                        "paddingRight": "5vh",
+                                        "item": [
+                                            {
+                                                "type": "Container",
+                                                "items": [
+                                                    {
+                                                        "type": "Text",
+                                                        "id": "title",
+                                                        "text": " ",
+                                                        "width": "100%",
+                                                        "fontSize": "8vh",
+                                                        "maxLines": 2
+                                                    },
+                                                    {
+                                                        "type": "Text",
+                                                        "id": "subtitle",
+                                                        "text": " ",
+                                                        "width": "100%",
+                                                        "fontSize": "5vh",
+                                                        "paddingTop": "3vh",
+                                                        "maxLines": 3
+                                                    }
+                                                ]
+                                            }
+                                        ]
                                     },
                                     {
-                                        "type": "Text",
-                                        "id": "subtitle",
-                                        "text": " ",
-                                        "width": "100vw",
-                                        "fontSize": "5vh",
-                                        "paddingTop": "1vh",
-                                        "paddingLeft": "3vh"
-                                    },
-                                    {
-                                        "type": "CustomAlexaTransportControls",
+                                        "type": "Frame",
                                         "position": "absolute",
-                                        "bottom": "0",
-                                        "autoplay": true,
-                                        "primaryControlSize": "10vh",
-                                        "secondaryControlSize": "10vh",
-                                        "mediaComponentId": "videoPlayer",
-                                        "playPauseToggleButtonId": "alexaPlayPauseToggleButton"
+                                        "bottom": "2vh",
+                                        "backgroundColor": "${@viewportProfile == @hubRoundSmall ? 'transparent' : 'rgba(0,0,0,40%)'}",
+                                        "borderRadius": "20",
+                                        "item": {
+                                            "type": "CustomAlexaTransportControls",
+                                            "autoplay": true,
+                                            "primaryControlSize": "10vh",
+                                            "secondaryControlSize": "10vh",
+                                            "mediaComponentId": "videoPlayer",
+                                            "playPauseToggleButtonId": "alexaPlayPauseToggleButton"
+                                        }
                                     }
                                 ]
                             }
