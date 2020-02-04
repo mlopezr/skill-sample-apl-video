@@ -291,18 +291,24 @@ module.exports = (playlist) => {
                                                         "type": "Text",
                                                         "id": "title",
                                                         "text": " ",
-                                                        "width": "100%",
+                                                        "width": "100vw",
                                                         "fontSize": "8vh",
-                                                        "maxLines": 2
+                                                        "maxLines": 2,
+                                                        "paddingTop": "3vh",
+                                                        "paddingLeft": "3vw",
+                                                        "paddingRight": "3vw"
                                                     },
                                                     {
                                                         "type": "Text",
                                                         "id": "subtitle",
                                                         "text": " ",
-                                                        "width": "100%",
+                                                        "width": "100vw",
                                                         "fontSize": "5vh",
                                                         "paddingTop": "3vh",
-                                                        "maxLines": 3
+                                                        "maxLines": 3,
+                                                        "paddingTop": "1vh",
+                                                        "paddingLeft": "3vw",
+                                                        "paddingRight": "3vw"
                                                     }
                                                 ]
                                             }
